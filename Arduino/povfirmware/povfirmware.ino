@@ -1,6 +1,6 @@
 #include <avr/pgmspace.h>
 
-String message = "CHICKEN MCGRITTLE";
+String message = "JUSTIN CHEN";
 byte refreshrate = 2;
 
 int len = message.length();
@@ -469,7 +469,8 @@ void display10(boolean letter[]) {
 }
 
 void setup() {
-  
+  pinMode(A0,INPUT);
+  Serial.begin(9600);
   // setting all of the port pins to be outputs
   // '0xFF' is equivalent to '0b11111111' which
   // sets all the pins to be outputs
@@ -521,17 +522,37 @@ void setup() {
 }
 
 void loop() {
-   //space at beginning of text
+  int delayconst=1;
+  int user = analogRead(A0);
+  
+ 
+  Serial.println(user);
+  if(user<=60){
+    refreshrate=4;
+    delayconst=18;
+  }
+  else if(user>60 && user<=200){
+    refreshrate=3;
+    delayconst=20;
+  }
+  else if(user>200 && user<=1023){
+    refreshrate=2;
+    delayconst=20;
+  }
+  // space at beginning of message
   PORTB = 0;
   PORTD = 0;
-  PORTC = 0;
   delay(refreshrate * 3);
 
   for (n = 0; n < len; n++) { //go through each character of message and call function display7 to display letter
-    if (message.charAt(n) == 'A') {
+    int x = analogRead(A5);
+  //Serial.println(x);
+      if(x>=370){
+    delay(10*delayconst);
+    }
+   else if (message.charAt(n) == 'A') {
       display7(letterA);
     }
-
     else if (message.charAt(n) == 'B') {
       display7(letterB);
     }
@@ -611,17 +632,16 @@ void loop() {
     else if (message.charAt(n) == ' ') {
       PORTB = 0;
       PORTD = 0;
-      PORTC = 0;
-      delay(refreshrate * 3); //off for 3 pixels
+      // turns off LEDs for 3 cycles to create a space in the message
+      delay(refreshrate * 3); 
     }
-    //space between each character
+    // creates a small space between each character
     PORTB = 0;
     PORTD = 0;
-    PORTC = 0;
     delay(refreshrate);
   }
 
-  //space at end of text
+  // creates a space at the end of the message
   PORTB = 0;
   PORTD = 0;
   PORTC = 0;
