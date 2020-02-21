@@ -1,9 +1,15 @@
 #include <avr/pgmspace.h>
 
+// user defined string that will be displayed by the wand
 String message = "JUSTIN CHEN";
-byte refreshrate = 2;
 
+// initialization of global variables for refresh rate and
+// message length, as well as variables for loops
+byte refreshrate = 2;
 int len = message.length();
+int n;
+int t;
+int i;
 
 // bytes that will hold the data for each cycle
 // data1 will control pins 8-13(PORTB) and data2
@@ -11,9 +17,6 @@ int len = message.length();
 byte data1 = 0;
 byte data2 = 0;
 
-int n;
-int t;
-int i;
 
 // array that can be ran to test all LEDs are working
 const boolean test[] PROGMEM= {
@@ -426,6 +429,8 @@ void display7(boolean letter[]) {
   }
 }
 
+// function to print out extra wide letters, such as W,M,Q
+
 void display10(boolean letter[]) { 
   // iterates through the 10 'columns' of data in the array
   for (t = 0; t < 10; t++) {
@@ -469,8 +474,11 @@ void display10(boolean letter[]) {
 }
 
 void setup() {
+  // sets analog pins for potentiometer and accelerometer
+  // to be inputs
   pinMode(A0,INPUT);
-  Serial.begin(9600);
+  pinMode(A5,INPUT);
+  
   // setting all of the port pins to be outputs
   // '0xFF' is equivalent to '0b11111111' which
   // sets all the pins to be outputs
@@ -508,7 +516,7 @@ void setup() {
     PORTB = data1;
     PORTD = data2;
 
-    // delays for the refresh rate set by user
+    // delays for 100 ms
     delay(100);
 
     // clears data stored in bytes data1 and data2
@@ -522,33 +530,42 @@ void setup() {
 }
 
 void loop() {
-  int delayconst=1;
+  // declares variable to be used to set the delay which prevents the wand from printing
+  // backwards
+  int delayconst;
+
+  // reads potentiometer user input to calculate refresh rate
   int user = analogRead(A0);
-  
- 
-  Serial.println(user);
+
+  // conditional statements for deciding which of the 3 speeds to operate at by setting the values of
+  // 'refreshrate' and 'delayconst'
   if(user<=60){
     refreshrate=4;
-    delayconst=18;
+    delayconst=250;
   }
   else if(user>60 && user<=200){
     refreshrate=3;
-    delayconst=20;
+    delayconst=200;
   }
   else if(user>200 && user<=1023){
     refreshrate=2;
-    delayconst=20;
+    delayconst=200;
   }
   // space at beginning of message
   PORTB = 0;
   PORTD = 0;
   delay(refreshrate * 3);
-
-  for (n = 0; n < len; n++) { //go through each character of message and call function display7 to display letter
+  
+  //go through each character of message and call function display7 to display letter
+  for (n = 0; n < len; n++) {
+    
+    // reads x axis value from the accelerometer at the beginning of each iteration 
     int x = analogRead(A5);
-  //Serial.println(x);
+    
+    // conditional statement which causes the pov wand to stop displaying when the user
+    // reaches the end of their swing
       if(x>=370){
-    delay(10*delayconst);
+    delay(delayconst);
     }
    else if (message.charAt(n) == 'A') {
       display7(letterA);
