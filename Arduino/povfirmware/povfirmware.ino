@@ -1,7 +1,16 @@
+// Name: Will Dodge
+// Email: dodgew@oregonstate.edu
+
+// This code was modeled after a project found on instructables.com
+// at https://www.instructables.com/id/Persistence-of-Vision-Wand/ 
+// The character arrays and functions were rewritten to work with
+// different hardware.
+
 #include <avr/pgmspace.h>
 
+
 // user defined string that will be displayed by the wand
-String message = "JUSTIN CHEN";
+String message = "HELLO THERE";
 
 // initialization of global variables for refresh rate and
 // message length, as well as variables for loops
